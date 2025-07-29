@@ -29,8 +29,19 @@ extensions:
   jaeger_storage:
     backends:
       some_storage:
-        memory:
-          max_traces: 100000
+        # memory:
+        #   max_traces: 100000
+        cassandra:
+          schema: 
+            keyspace: "jaeger_v1_test"
+            # create: "${env:CASSANDRA_CREATE_SCHEMA:-true}"
+          connection:
+            auth: 
+              basic:
+                username: "user"
+                password: "password"
+            tls:
+              insecure: true
 
   remote_sampling:
     # We can either use file or adaptive sampling strategy in remote_sampling
