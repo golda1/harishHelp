@@ -4,7 +4,10 @@ service:
     traces:
       receivers: [otlp, jaeger, zipkin]
       processors: [batch]
-      exporters: [jaeger_storage_exporter]
+      exporters: [jaeger_storage_exporter, spanmetrics]
+    metrics/spanmetrics:
+      receivers: [spanmetrics]
+      exporters: [prometheus]
   telemetry:
     resource:
       service.name: jaeger
@@ -25,7 +28,7 @@ extensions:
   jaeger_query:
     storage:
       traces: some_storage
-
+      metrics: some_metrics_storage
   jaeger_storage:
     backends:
       some_storage:
@@ -42,6 +45,12 @@ extensions:
                 password: "password"
             tls:
               insecure: true
+    metric_backends:
+      some_metrics_storage:
+        prometheus:
+          endpoint: http://prometheus:9090
+          normalize_calls: true
+          normalize_duration: true
 
   remote_sampling:
     # We can either use file or adaptive sampling strategy in remote_sampling
@@ -71,6 +80,9 @@ extensions:
     # so we override it with a normal port
     endpoint: "${env:JAEGER_LISTEN_HOST:-0.0.0.0}:27778"
 
+connectors:
+  spanmetrics:
+
 receivers:
   otlp:
     protocols:
@@ -99,3 +111,5 @@ processors:
 exporters:
   jaeger_storage_exporter:
     trace_storage: some_storage
+  prometheus:
+    endpoint: "0.0.0.0:8889"
