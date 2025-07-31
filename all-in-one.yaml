@@ -39,6 +39,7 @@ extensions:
             keyspace: "jaeger_v1_test"
             # create: "${env:CASSANDRA_CREATE_SCHEMA:-true}"
           connection:
+            servers: "jaeger-cassandra.jaeger.svc.cluster.local:9042"
             auth: 
               basic:
                 username: "user"
