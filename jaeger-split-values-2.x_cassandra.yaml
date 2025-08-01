@@ -87,7 +87,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 allInOne:
-  enabled: true
+  enabled: false
   replicas: 1
   image:
     registry: ""
@@ -310,32 +310,6 @@ cassandra:
     endpoint_snitch: GossipingPropertyFileSnitch
 # End: Override values on the Cassandra subchart to customize for Jaeger
 
-# Begin: Override values on the Kafka subchart to customize for Jaeger
-kafka:
-  listeners:
-    client:
-      protocol: PLAINTEXT
-    controller:
-      protocol: PLAINTEXT
-    interbroker:
-      protocol: PLAINTEXT
-    external:
-      protocol: PLAINTEXT
-  controller:
-    replicaCount: 3
-    extraConfig: |
-      auto.create.topics.enable=true
-# Zookeeper has been deprecated by Kafka in favor of Kraft Mode: https://developer.confluent.io/learn/kraft/
-# Documentation for upgrading Kafka and keeping Zookeeper: https://github.com/bitnami/charts/tree/main/bitnami/kafka#upgrading-from-zookeeper-mode
-# Documentation for migrating away from Zookeeper to Kraft Mode: https://github.com/bitnami/charts/tree/main/bitnami/kafka#migrating-from-zookeeper-early-access
-  # zookeeper:
-  #   enabled: false
-  #   replicaCount: 1
-  #   serviceAccount:
-  #     create: true
-
-# End: Override values on the Kafka subchart to customize for Jaeger
-
 # Begin: Default values for the various components of Jaeger
 # This chart has been based on the Kubernetes integration found in the following repo:
 # https://github.com/jaegertracing/jaeger-kubernetes/blob/main/production/jaeger-production-template.yml
@@ -427,155 +401,10 @@ elasticsearch: {}
 #   ingest:
 #     replicaCount: 0
 
-ingester:
-  enabled: false
-  podSecurityContext: {}
-  securityContext: {}
-  annotations: {}
-  image:
-    registry: ""
-    repository: jaegertracing/jaeger-ingester
-    tag: "2.8.0"
-    digest: ""
-    pullPolicy: IfNotPresent
-    pullSecrets: []
-  dnsPolicy: ClusterFirst
-  cmdlineParams: {}
-  replicaCount: 1
-  autoscaling:
-    enabled: false
-    minReplicas: 2
-    maxReplicas: 10
-    behavior: {}
-    # targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
-  service:
-    annotations: {}
-    # List of IP ranges that are allowed to access the load balancer (if supported)
-    loadBalancerSourceRanges: []
-    type: ClusterIP
-  resources:
-    {}
-    # limits:
-    #   cpu: 1
-    #   memory: 1Gi
-    # requests:
-    #   cpu: 500m
-    #   memory: 512Mi
-  serviceAccount:
-    create: true
-    # Explicitly mounts the API credentials for the Service Account
-    automountServiceAccountToken: false
-    annotations: {}
-    name:
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-  podAnnotations: {}
-  ## Additional pod labels
-  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-  podLabels: {}
-  extraSecretMounts: []
-  extraConfigmapMounts: []
-  extraEnv: []
-  envFrom: []
-  initContainers: []
-
-  serviceMonitor:
-    enabled: false
-    additionalLabels: {}
-    # https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
-    relabelings: []
-    # -- ServiceMonitor metric relabel configs to apply to samples before ingestion
-    # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#endpoint
-    metricRelabelings: []
-
-agent:
-  podSecurityContext: {}
-  securityContext: {}
-  enabled: false
-  annotations: {}
-  image:
-    registry: ""
-    repository: jaegertracing/jaeger-agent
-    tag: "2.8.0"
-    digest: ""
-    pullPolicy: IfNotPresent
-    pullSecrets: []
-  cmdlineParams: {}
-  extraEnv: []
-  daemonset:
-    useHostPort: false
-    updateStrategy:
-      {}
-      # type: RollingUpdate
-      # rollingUpdate:
-      #   maxUnavailable: 1
-  service:
-    annotations: {}
-    # List of IP ranges that are allowed to access the load balancer (if supported)
-    loadBalancerSourceRanges: []
-    type: ClusterIP
-    # zipkinThriftPort :accept zipkin.thrift over compact thrift protocol
-    zipkinThriftPort: 5775
-    # compactPort: accept jaeger.thrift over compact thrift protocol
-    compactPort: 6831
-    # binaryPort: accept jaeger.thrift over binary thrift protocol
-    binaryPort: 6832
-    # samplingPort: (HTTP) serve configs, sampling strategies
-    samplingPort: 5778
-  resources:
-    {}
-    # limits:
-    #   cpu: 500m
-    #   memory: 512Mi
-    # requests:
-    #   cpu: 256m
-    #   memory: 128Mi
-  serviceAccount:
-    create: true
-    # Explicitly mounts the API credentials for the Service Account
-    automountServiceAccountToken: false
-    name:
-    annotations: {}
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-  podAnnotations: {}
-  ## Additional pod labels
-  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-  podLabels: {}
-  extraSecretMounts: []
-  # - name: jaeger-tls
-  #   mountPath: /tls
-  #   subPath: ""
-  #   secretName: jaeger-tls
-  #   readOnly: true
-  extraConfigmapMounts: []
-  # - name: jaeger-config
-  #   mountPath: /config
-  #   subPath: ""
-  #   configMap: jaeger-config
-  #   readOnly: true
-  envFrom: []
-  useHostNetwork: false
-  dnsPolicy: ClusterFirst
-  priorityClassName: ""
-  initContainers: []
-
-  serviceMonitor:
-    enabled: false
-    additionalLabels: {}
-    # https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
-    relabelings: []
-    # -- ServiceMonitor metric relabel configs to apply to samples before ingestion
-    # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#endpoint
-    metricRelabelings: []
-
 collector:
   podSecurityContext: {}
   securityContext: {}
-  enabled: false
+  enabled: true
   annotations: {}
   image:
     registry: ""
@@ -589,14 +418,14 @@ collector:
   envFrom: []
   cmdlineParams: {}
   basePath: /
-  replicaCount: 1
+  replicaCount: 2
   autoscaling:
-    enabled: false
+    enabled: true
     minReplicas: 2
     maxReplicas: 10
     behavior: {}
-    # targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
   service:
     annotations: {}
     # The IP to be used by the load balancer (if supported)
@@ -615,19 +444,19 @@ collector:
       # nodePort:
     # can accept Zipkin spans in JSON or Thrift
     zipkin:
-      {}
-      # port: 9411
+      # {}
+      port: 9411
       # nodePort:
     otlp:
       grpc:
-        {}
-        # name: otlp-grpc
-        # port: 4317
+        # {}
+        name: otlp-grpc
+        port: 4317
         # nodePort:
       http:
-        {}
-        # name: otlp-http
-        # port: 4318
+        # {}
+        name: otlp-http
+        port: 4318
         # nodePort:
     healthCheck:
       name: healthcheck
@@ -744,7 +573,7 @@ collector:
     #   customRules: []
 
 query:
-  enabled: false
+  enabled: true
   basePath: /
   initContainers: []
   oAuthSidecar:
