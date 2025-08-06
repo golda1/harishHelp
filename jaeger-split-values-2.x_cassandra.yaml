@@ -39,6 +39,8 @@ cassandra:
 # This is the jaeger-cassandra-schema Job which sets up the Cassandra schema for
 # use by Jaeger
 schema:
+  image:
+    tag: "1.71.0"
   extraEnv:
     - name: MODE
       value: prod
@@ -68,17 +70,14 @@ collector:
   service:
     # can accept Zipkin spans in JSON or Thrift
     zipkin:
-      # {}
       port: 9411
       # nodePort:
     otlp:
       grpc:
-        # {}
         name: otlp-grpc
         port: 4317
         # nodePort:
       http:
-        # {}
         name: otlp-http
         port: 4318
         # nodePort:
@@ -88,6 +87,7 @@ query:
   annotations: {}
   image:
     tag: "2.8.0"
-
+  agentSidecar:
+    enabled: true
 # End: Default values for the various components of Jaeger
 
