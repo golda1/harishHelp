@@ -81,8 +81,8 @@ collector:
         name: otlp-http
         port: 4318
         # nodePort:
-  serviceMonitor:
-    enabled: true
+  # serviceMonitor:
+  #   enabled: true
 
 query:
   enabled: true
@@ -90,8 +90,8 @@ query:
   image:
     tag: "2.8.0"
   agentSidecar:
-    enabled: true
-  serviceMonitor:
-    enabled: true
+    enabled: false
+  # serviceMonitor:
+  #   enabled: true
 # End: Default values for the various components of Jaeger
 
